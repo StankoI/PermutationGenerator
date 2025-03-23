@@ -3,7 +3,6 @@
 #include <time.h>
 #include <stdbool.h>
 
-// Инициализира масива с числата 0, 1, 2, ..., size - 1
 void init(int *array, int size)
 {
     for (int i = 0; i < size; i++)
@@ -12,17 +11,14 @@ void init(int *array, int size)
     }
 }
 
-// Принтира масива от позиция 1 до size-1
 void printArray(int *array, int size)
 {
     for (int i = 0; i < size; i++)
     {
         printf("%d ", array[i]);
     }
-    // printf("\n");
 }
 
-// Премахва елемент на даден индекс от масива
 void removeByIndex(int *array, int *size, int index)
 {
     for (int i = index; i < *size - 1; i++)
@@ -43,46 +39,40 @@ void generateRandomPermutation(int *arr, int n)
         result[i] = 0;
     }
 
-    int notUsed[n + 1]; // от 0 до n
+    int notUsed[n + 1]; 
     int sizeOfNotUsed = n + 1;
 
-    init(notUsed, sizeOfNotUsed); // неИзползвани числа: 0,1,2,3,...,n
+    init(notUsed, sizeOfNotUsed); 
 
     int start = 1;
     int cur = start;
 
     while (sizeOfNotUsed > 2)
-    { // Остават не по-малко от две числа (0 + поне още 1)
-        // Избираме произволно число от неИзползваните, БЕЗ notUsed[0] (което е 0, за удобство)
-        int nextIndex = (rand() % (sizeOfNotUsed - 1)) + 1; // от 1 до sizeOfNotUsed - 1
+    { 
+        int nextIndex = (rand() % (sizeOfNotUsed - 1)) + 1; 
         int next = notUsed[nextIndex];
 
-        // Свързваме cur към next
         result[cur] = next;
 
-        // Премахваме next от списъка на неИзползвани
         removeByIndex(notUsed, &sizeOfNotUsed, nextIndex);
 
         cur = next;
 
-        // Ако сме се върнали до start, започваме нов цикъл от най-малкия останал
         if (cur == start)
         {
             cyclesCount++;
             if (sizeOfNotUsed <= 1)
-                break;          // няма останали числа
-            start = notUsed[1]; // взимаме следващото най-малко неИзползвано
+                break;         
+            start = notUsed[1];
             cur = start;
         }
     }
 
-    // Свързваме последното число към последното останало неИзползвано
     if (sizeOfNotUsed == 2)
     {
         result[cur] = notUsed[1];
     }
 
-    // Копираме резултата в arr, като пропускаме елемента на индекс 0
     for (int i = 1; i <= n; i++)
     {
         arr[i - 1] = result[i];
@@ -108,21 +98,19 @@ int rankOfPermutation(int* arr, int len)
 
 void permutationByRank(int* arr, int len, int rank)
 {
-    // Проверка за невалидни входни данни
     if (arr == NULL || len <= 0)
         return;
 
     if (rank < 1)
     {
-        arr[0] = 0; // Индикатор за грешка
+        arr[0] = 0; 
         return;
     }
 
-    // Заеляме масиви за факториелите и елементите
     int* factorials = (int*)malloc(len * sizeof(int));
     if (factorials == NULL)
     {
-        arr[0] = 0; // Грешка при заделяне
+        arr[0] = 0; 
         return;
     }
 
@@ -130,7 +118,6 @@ void permutationByRank(int* arr, int len, int rank)
     int k, i;
     factorials[len - 1] = f;
 
-    // Изчисляваме факториелите
     for (k = 1, i = len - 2; k < len; ++k, --i)
     {
         f *= k;
@@ -138,31 +125,28 @@ void permutationByRank(int* arr, int len, int rank)
     }
     f *= len;
 
-    // Проверка дали рангът е извън допустимите стойности
     if (rank > f)
     {
-        arr[0] = 0; // Индикатор за грешка
+        arr[0] = 0; 
         free(factorials);
         return;
     }
 
     --rank;
 
-    // Масив за съхранение на наличните елементи
     int* elements = (int*)malloc(len * sizeof(int));
     if (elements == NULL)
     {
-        arr[0] = 0; // Грешка при заделяне
+        arr[0] = 0; 
         free(factorials);
         return;
     }
 
     for (i = 0; i < len; ++i)
     {
-        elements[i] = 1; // Отбелязваме всички елементи като налични
+        elements[i] = 1; 
     }
 
-    // Генерираме пермутацията по ранг
     for (k = 0; k < len; ++k)
     {
         f = factorials[k];
@@ -179,10 +163,9 @@ void permutationByRank(int* arr, int len, int rank)
         }
 
         arr[k] = i + 1;
-        elements[i] = 0; // Отстраняваме елемента
+        elements[i] = 0;
     }
 
-    // Освобождаваме заделената памет
     free(elements);
     free(factorials);
 }
@@ -203,9 +186,6 @@ void countPerm()
         generateRandomPermutation(array, n);
 
         count[rankOfPermutation(array,n)]++;
-
-        // printf("num of cycles: %d \n", cyclesCount);
-        // printArray(array,n);
     }
 
     for(int i = 1; i < 25; i++)
