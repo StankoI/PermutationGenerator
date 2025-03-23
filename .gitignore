@@ -1,2 +1,4 @@
-./CPP/
-./hello
+.gitignore
+CPP/
+hello
+.vscode
