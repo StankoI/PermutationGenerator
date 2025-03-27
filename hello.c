@@ -164,58 +164,74 @@ int rankOfPermutation(int* arr, int len)
       sum += (cnt * factorial);
    }
    return sum;
-}
+} 
 
-// Генерира пермутация по даден ранг
 void permutationByRank(int* arr, int len, int rank)
 {
+    // Проверка за невалидни входни данни
     if (arr == NULL || len <= 0)
         return;
 
     if (rank < 1)
     {
-        arr[0] = 0; 
+        arr[0] = 0; // Индикатор за грешка
         return;
     }
 
+    // Заеляме масиви за факториелите и елементите
     int* factorials = (int*)malloc(len * sizeof(int));
     if (factorials == NULL)
     {
-        arr[0] = 0; 
+        arr[0] = 0; // Грешка при заделяне
         return;
     }
 
     int f = 1;
-    for (int k = 1, i = len - 2; k < len; ++k, --i)
+    int k, i;
+    factorials[len - 1] = f;
+
+    // Изчисляваме факториелите
+    for (k = 1, i = len - 2; k < len; ++k, --i)
     {
         f *= k;
         factorials[i] = f;
     }
     f *= len;
 
+    // Проверка дали рангът е извън допустимите стойности
     if (rank > f)
     {
-        arr[0] = 0; 
+        arr[0] = 0; // Индикатор за грешка
         free(factorials);
         return;
     }
 
     --rank;
 
+    // Масив за съхранение на наличните елементи
     int* elements = (int*)malloc(len * sizeof(int));
-    for (int i = 0; i < len; ++i)
+    if (elements == NULL)
     {
-        elements[i] = 1; 
+        arr[0] = 0; // Грешка при заделяне
+        free(factorials);
+        return;
     }
 
-    for (int k = 0; k < len; ++k)
+    for (i = 0; i < len; ++i)
+    {
+        elements[i] = 1; // Отбелязваме всички елементи като налични
+    }
+
+    // Генерираме пермутацията по ранг
+    for (k = 0; k < len; ++k)
     {
         f = factorials[k];
         int q = rank / f;
         rank -= (q * f);
         ++q;
 
-        int cnt = 0, i = -1;
+        int cnt = 0;
+        i = -1;
         while (cnt < q)
         {
             ++i;
@@ -223,15 +239,46 @@ void permutationByRank(int* arr, int len, int rank)
         }
 
         arr[k] = i + 1;
-        elements[i] = 0;
+        elements[i] = 0; // Отстраняваме елемента
     }
 
+    // Освобождаваме заделената памет
     free(elements);
     free(factorials);
 }
 
+
+//тества равномерното разппределние при генерирането на случайна пермутация 
+void testRandomPermGenWithLenght4(int numOfIterations)
+{
+    const int n = 4;
+    int countPerm[25]; // 1...24
+    
+    for(int i = 0; i < 25; i++)
+    {
+        countPerm[i] = 0;
+    }
+    
+    for(int i = 0; i < numOfIterations; i++)
+    {
+        int arr[n];
+        generateRandomPermutation(arr,n);
+
+        countPerm[rankOfPermutation(arr,n)]++;
+    }
+    
+    for(int i = 1; i < 25; i++)
+    {
+        int arr[n];
+        permutationByRank(arr,n,i);
+        printf("Пермутация "); 
+        printArray(arr,n);
+        printf("е генерирана %d пъти\n", countPerm[i]);
+    }
+}
+
 // Тества средния брой цикли в пермутация
-void averageNumOfCyclesInPermutation(int n, int numOFIterations)
+void averageNumOfCyclesInPermutation(int n, int numOfIterations)
 {
     int array[n];
     int cyclesCount[n+1]; 
@@ -243,7 +290,7 @@ void averageNumOfCyclesInPermutation(int n, int numOFIterations)
 
     double sum = 0;
 
-    for(int i = 0; i < numOfIteration; i++)
+    for(int i = 0; i < numOfIterations; i++)
     {
         generateRandomPermutation(array, n);
         cyclesCount[cyclesCounter]++;
@@ -254,7 +301,7 @@ void averageNumOfCyclesInPermutation(int n, int numOFIterations)
         sum += cyclesCount[i] * i; 
     }
 
-    double result = sum / numOfIteration; 
+    double result = sum / numOfIterations; 
 
     printf("Средният брой на циклите в пермутация с дължина %d е %f\n", n, result );
 }
@@ -291,8 +338,13 @@ int main()
 
     int n = 16;
     const int numIterations = 1000000;
+    // testRandomPermGenWithLenght4(numIterations);
 
-    testExpectedNumOfCyclesWithLengthR(n, numIterations);
+    // Тества средния брой цикли в пермутация
+    // averageNumOfCyclesInPermutation(n,numIterations);
+
+    // Тества теоретичните и експерименталните стойности на E[d_r]
+    // testExpectedNumOfCyclesWithLengthR(n, numIterations);
 
     return 0;
 }
